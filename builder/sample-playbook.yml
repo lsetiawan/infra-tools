@@ -1,0 +1,24 @@
+---
+- name: Containerized version test
+  hosts: all
+  # To suppress gathering facts for containers without python
+  gather_facts: false
+  vars:
+    ansible_bender:
+      base_image: ubuntu:18.04
+      target_image:
+        name: ansb-test-image
+      working_container:
+        user: '{{ ansible_user }}'
+        volumes:
+        # mount this git repo to the working container at /src
+        - "{{ playbook_dir }}:/src"
+  tasks:
+  # Raw for installing python3 before proceeding 
+  # for base images without python
+  - raw: apt-get update -yqq
+  - raw: apt-get install -yqq --no-install-recommends python3
+  - name: install dependencies
+    apt:
+      name: software-properties-common
+      state: present
